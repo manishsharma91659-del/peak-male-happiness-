@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peak male things</title>
+
+<style>
+body {margin:0;font-family:sans-serif;background:#f8f8f8;}
+
+/* HERO */
+.hero {
+  height:90vh;
+  background:url('https://i.ibb.co/6yQZ6kH/graphene.jpg') center/cover;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  color:white;
+  text-align:center;
+}
+.hero h1 {font-size:2.5rem;}
+.cta {
+  background:#ff3d00;
+  color:white;
+  padding:12px 20px;
+  border:none;
+  margin-top:10px;
+}
+
+/* TRUST BAR */
+.trust {
+  display:flex;
+  justify-content:space-around;
+  padding:10px;
+  background:white;
+  font-size:14px;
+}
+
+/* PRODUCTS */
+.products {padding:15px;}
+.grid {display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.card {background:white;padding:10px;border-radius:10px;}
+.card img {width:100%;border-radius:10px;}
+.card button {
+  width:100%;
+  background:black;
+  color:white;
+  padding:10px;
+  border:none;
+}
+
+/* SCARCITY */
+.badge {
+  color:red;
+  font-size:12px;
+}
+
+/* CART BAR */
+.cart-bar {
+  position:fixed;
+  bottom:0;
+  width:100%;
+  background:black;
+  color:white;
+  padding:10px;
+  display:flex;
+  justify-content:space-between;
+}
+
+/* MODAL */
+.modal {
+  position:fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  background:white;
+  display:none;
+  padding:15px;
+}
+.modal.active {display:block;}
+
+input {width:100%;padding:10px;margin:5px 0;}
+
+/* REVIEWS */
+.reviews {
+  background:white;
+  padding:15px;
+  margin-top:10px;
+}
+.review {
+  border-bottom:1px solid #ddd;
+  padding:8px 0;
+}
+
+/* WHATSAPP */
+.whatsapp {
+  position:fixed;
+  right:15px;
+  bottom:70px;
+  background:#25D366;
+  color:white;
+  padding:15px;
+  border-radius:50%;
+}
+</style>
+</head>
+
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Peak male things</h1>
+  <p>Peak dopamine. Best prices.</p>
+  <button class="cta" onclick="scrollToProducts()">Shop Now</button>
+  <p id="timer"></p>
+</div>
+
+<!-- TRUST -->
+<div class="trust">
+  <div>🚚 3-5 Day Delivery</div>
+  <div>💵 Cash on Delivery</div>
+  <div>⭐ 4.8 Rating</div>
+</div>
+
+<!-- PRODUCTS -->
+<div class="products" id="products">
+  <h2>Trending Now</h2>
+
+  <div class="grid">
+
+    <div class="card">
+      <span class="badge">Only 7 left</span>
+      <img src="https://i.ibb.co/6yQZ6kH/graphene.jpg">
+      <h4>Graphene</h4>
+      <p>₹599</p>
+      <button onclick="addToCart('Graphene',599)">Buy Now</button>
+    </div>
+
+    <div class="card">
+      <span class="badge">Hot Selling</span>
+      <img src="https://i.ibb.co/fn0nQ8T/handgrip.jpg">
+      <h4>Handgrip</h4>
+      <p>₹149</p>
+      <button onclick="addToCart('Handgrip',149)">Buy Now</button>
+    </div>
+
+    <div class="card">
+      <img src="https://i.ibb.co/3pPpZpH/microfiber.jpg">
+      <h4>Microfiber</h4>
+      <p>₹199</p>
+      <button onclick="addToCart('Microfiber',199)">Buy Now</button>
+    </div>
+
+    <div class="card">
+      <img src="https://i.ibb.co/Ky9tZcM/pen.jpg">
+      <h4>Pen</h4>
+      <p>₹19</p>
+      <button onclick="addToCart('Pen',19)">Buy Now</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- REVIEWS -->
+<div class="reviews">
+  <h3>What Customers Say</h3>
+
+  <div class="review">⭐️⭐️⭐️⭐️⭐️ "Quality is insane for price!"</div>
+  <div class="review">⭐️⭐️⭐️⭐️⭐️ "Ordered again, worth it"</div>
+  <div class="review">⭐️⭐️⭐️⭐️ "Fast delivery"</div>
+</div>
+
+<!-- CART BAR -->
+<div class="cart-bar" onclick="openCart()">
+  <span id="items">0 items</span>
+  <span id="total">₹0</span>
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="cartModal">
+  <h2>Checkout</h2>
+  <div id="cartItems"></div>
+  <h3>Total ₹<span id="finalTotal">0</span></h3>
+
+  <input id="name" placeholder="Full Name">
+  <input id="phone" placeholder="Phone Number">
+  <input id="address" placeholder="Full Address">
+
+  <button onclick="placeOrder()">Confirm Order</button>
+</div>
+
+<!-- WHATSAPP -->
+<a class="whatsapp" href="https://wa.me/9313883060">💬</a>
+
+<script>
+let cart={};
+
+function scrollToProducts(){
+ document.getElementById('products').scrollIntoView({behavior:'smooth'});
+}
+
+function addToCart(name,price){
+ if(!cart[name]) cart[name]={price,qty:1};
+ else cart[name].qty++;
+ updateCart();
+}
+
+function updateCart(){
+ let total=0,count=0;
+ for(let i in cart){
+  total+=cart[i].price*cart[i].qty;
+  count+=cart[i].qty;
+ }
+ document.getElementById('items').innerText=count+" items";
+ document.getElementById('total').innerText="₹"+total;
+ document.getElementById('finalTotal').innerText=total;
+}
+
+function openCart(){
+ let html="";
+ for(let i in cart){
+  html+=`<p>${i} x ${cart[i].qty}</p>`;
+ }
+ document.getElementById('cartItems').innerHTML=html;
+ document.getElementById('cartModal').classList.add('active');
+}
+
+function placeOrder(){
+ let n=name.value,p=phone.value,a=address.value;
+ if(!n||!p){alert("Fill details");return;}
+
+ let msg=`New Order%0AName:${n}%0APhone:${p}%0AAddress:${a}%0A`;
+ for(let i in cart){
+  msg+=`${i} x ${cart[i].qty}%0A`;
+ }
+
+ window.open(`https://wa.me/9313883060?text=${msg}`);
+}
+
+/* TIMER */
+let t=600;
+setInterval(()=>{
+ let m=Math.floor(t/60);
+ let s=t%60;
+ document.getElementById("timer").innerText=
+ "Offer ends in "+m+":"+s;
+ t--;
+},1000);
+</script>
+
+</body>
+</html>
